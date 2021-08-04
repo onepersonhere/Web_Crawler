@@ -9,13 +9,16 @@ import org.hyperskill.hstest.mocks.web.WebServerMock;
 import org.hyperskill.hstest.stage.SwingTest;
 import org.hyperskill.hstest.testcase.CheckResult;
 import org.hyperskill.hstest.testing.swing.SwingComponent;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import javax.swing.*;
-import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +30,7 @@ public class CrawlerTest extends SwingTest {
     private static List<String> parsedPages;
 
     Map<String, String> mapOfLinksNTitles = pageContent.getLinksNTitles();
+    private final String EXPORT_DIRECTORY = Paths.get("").toAbsolutePath().toString() + "/temp.txt";
 
 
     public CrawlerTest() {
@@ -80,6 +84,14 @@ public class CrawlerTest extends SwingTest {
         webServerMock.stop();
     }
 
+    @After
+    public void deleteFile() {
+        File file = new File(EXPORT_DIRECTORY);
+        if (file.exists()) {
+            boolean deleted = file.delete();
+        }
+    }
+
     @SwingComponent(name = "TitlesTable")
     JTableFixture titlesTable;
 
@@ -92,6 +104,12 @@ public class CrawlerTest extends SwingTest {
     @SwingComponent(name = "TitleLabel")
     JLabelFixture titleLabel;
 
+    @SwingComponent(name = "ExportUrlTextField")
+    JTextComponentFixture exportUrlTextField;
+
+    @SwingComponent(name = "ExportButton")
+    JButtonFixture exportButton;
+
     @DynamicTest(order = 1)
     CheckResult testComponents() {
 
@@ -99,11 +117,14 @@ public class CrawlerTest extends SwingTest {
         requireVisible(runButton);
         requireVisible(titleLabel);
         requireVisible(titlesTable);
-
+        requireVisible(exportUrlTextField);
+        requireVisible(exportButton);
 
         requireEnabled(textField);
         requireEnabled(runButton);
         requireEnabled(titleLabel);
+        requireEnabled(exportUrlTextField);
+        requireEnabled(exportButton);
 
         requireDisabled(titlesTable);
         titlesTable.requireColumnCount(2);
@@ -111,31 +132,8 @@ public class CrawlerTest extends SwingTest {
         return CheckResult.correct();
     }
 
+
     @DynamicTest(order = 2)
-    CheckResult testTableContainer() {
-        boolean containsJTable = false;
-        Component[] frameComponents = frame.getContentPane().getComponents();
-        for (Component c : frameComponents) {
-            if (c instanceof JScrollPane) {
-                Component[] scrollPaneComponents = ((JScrollPane) c).getViewport().getComponents();
-                for (Component s: scrollPaneComponents) {
-                    if (s instanceof JTable) {
-                        containsJTable = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (!containsJTable) {
-            return CheckResult.wrong("Titles Table should be placed inside a JScrollPane");
-        }
-
-        return  CheckResult.correct();
-    }
-
-
-    @DynamicTest(order = 3)
     CheckResult testTitles() {
 
 
@@ -152,9 +150,8 @@ public class CrawlerTest extends SwingTest {
         return CheckResult.correct();
     }
 
-    @DynamicTest(order = 4)
+    @DynamicTest(order = 3)
     CheckResult testTitlesTable() {
-
 
         Map<String, String> mapOfLinksNTitles = pageContent.getLinksNTitles();
 
@@ -170,7 +167,7 @@ public class CrawlerTest extends SwingTest {
         return CheckResult.correct();
     }
 
-    @DynamicTest(order = 5)
+    @DynamicTest(order = 4)
     CheckResult testTitlesTableForWrongLinks() {
 
         for (Map.Entry<String, String> m : mapOfLinksNTitles.entrySet()) {
@@ -186,7 +183,7 @@ public class CrawlerTest extends SwingTest {
         return CheckResult.correct();
     }
 
-    @DynamicTest(order = 6)
+    @DynamicTest(order = 5)
     CheckResult testForDoubleLinks() {
 
         for (Map.Entry<String, String> m : mapOfLinksNTitles.entrySet()) {
@@ -202,7 +199,7 @@ public class CrawlerTest extends SwingTest {
         return CheckResult.correct();
     }
 
-    @DynamicTest(order = 7)
+    @DynamicTest(order = 6)
     CheckResult testForUnavailableLinks() {
 
         for (Map.Entry<String, String> m : mapOfLinksNTitles.entrySet()) {
@@ -219,7 +216,7 @@ public class CrawlerTest extends SwingTest {
         return CheckResult.correct();
     }
 
-    @DynamicTest(order = 8)
+    @DynamicTest(order = 7)
     CheckResult testForRowNumber() {
 
         for (Map.Entry<String, String> m : mapOfLinksNTitles.entrySet()) {
@@ -228,13 +225,69 @@ public class CrawlerTest extends SwingTest {
             runButton.click();
             int numOfSubLinks = pageContent.getSubLinksWithLink(link);
             if (numOfSubLinks != titlesTable.rowCount()) {
-                return CheckResult.wrong("TitlesTable has wrong number of rows after parsing.\n" +
-                    "Expected: " + numOfSubLinks + ".\nFound: " + titlesTable.rowCount());
+                return CheckResult.wrong("TitlesTable has wrong number of rows after parsing");
             }
         }
 
         return CheckResult.correct();
     }
+
+    @DynamicTest(order = 8)
+    CheckResult testFileCreation() {
+
+        for (Map.Entry<String, String> m : mapOfLinksNTitles.entrySet()) {
+            String link = m.getKey();
+            textField.setText(link);
+            runButton.click();
+            exportUrlTextField.setText(EXPORT_DIRECTORY);
+            exportButton.click();
+            boolean fileExists = checkFileExistence();
+            if (!fileExists) {
+                return CheckResult.wrong("Your app did not save a file after exporting.");
+            }
+            deleteFile();
+        }
+
+        return CheckResult.correct();
+    }
+
+    @DynamicTest(order = 9)
+    CheckResult testFileContentLength() {
+
+        for (Map.Entry<String, String> m : mapOfLinksNTitles.entrySet()) {
+            String link = m.getKey();
+            int originalNumberOfLines = pageContent.getSubLinksWithLink(link);
+            textField.setText(link);
+            runButton.click();
+            exportUrlTextField.setText(EXPORT_DIRECTORY);
+            exportButton.click();
+            boolean correctLines = checkFileNumberOfLines(originalNumberOfLines);
+            if (!correctLines) {
+                return CheckResult.wrong("The file your app saves contains wrong number of lines");
+            }
+        }
+
+        return CheckResult.correct();
+    }
+
+    @DynamicTest(order = 10)
+    CheckResult testTitlesInFile() {
+
+        for (Map.Entry<String, String> m : mapOfLinksNTitles.entrySet()) {
+            String link = (String) m.getKey();
+            textField.setText(link);
+            runButton.click();
+            exportUrlTextField.setText(EXPORT_DIRECTORY);
+            exportButton.click();
+            boolean valid = checkEvenLines();
+            if (!valid) {
+                return CheckResult.wrong("The file your app saves contains wrong title for it's parent url");
+            }
+        }
+
+        return CheckResult.correct();
+    }
+
 
     private boolean checkTableContent(boolean testForValidLinks) {
         String[][] tableContent = titlesTable.contents();
@@ -287,5 +340,48 @@ public class CrawlerTest extends SwingTest {
             }
         }
         return true;
+    }
+
+    private boolean checkFileExistence() {
+        File file = new File(EXPORT_DIRECTORY);
+        return file.exists();
+    }
+
+    private boolean checkFileNumberOfLines(int originalNumberOfLines) {
+        //Multiplied by 2 because titles are placed after their corresponding link hence the total lines is doubled
+        originalNumberOfLines *= 2;
+        int fileLines = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(EXPORT_DIRECTORY))) {
+            while (reader.readLine() != null) {
+                fileLines++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return originalNumberOfLines == fileLines;
+    }
+
+    private boolean checkEvenLines() {
+        boolean valid = true;
+        int lineNumber = 1;
+        String line;
+        String originalTitle = "";
+        try (BufferedReader reader = new BufferedReader(new FileReader(EXPORT_DIRECTORY))) {
+            while ((line = reader.readLine()) != null) {
+                //Every odd line contains a link
+                if (lineNumber % 2 != 0) {
+                    originalTitle = pageContent.getTitleWithLink(line);
+                } else {
+                    //Every even line contains a title
+                    if (!line.equals(originalTitle)) {
+                        valid = false;
+                    }
+                }
+                lineNumber++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return valid;
     }
 }

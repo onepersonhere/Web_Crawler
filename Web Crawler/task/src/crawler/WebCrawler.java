@@ -5,9 +5,11 @@ import java.awt.*;
 
 public class WebCrawler extends JFrame {
     static JTextField textField = new TextField();
-    static JTextArea textArea = new TextArea();
     static JButton button = new GetButton();
     static JLabel titleLable = new TitleLabel();
+    static JTable table = new TitlesTable();
+    static JPanel export = new ExportPanel();
+
     public WebCrawler() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -37,19 +39,23 @@ public class WebCrawler extends JFrame {
         lowerpanel.add(titleLable);
         UpperUpperPanel.add(lowerpanel, BorderLayout.SOUTH);
 
+        JScrollPane sPane = new JScrollPane(table);
+
         add(UpperUpperPanel, BorderLayout.NORTH);
-        add(textArea, BorderLayout.CENTER);
+        add(sPane, BorderLayout.CENTER);
+        add(export, BorderLayout.SOUTH);
     }
 
     public static JTextField getTextField() {
         return textField;
     }
 
-    public static JTextArea getTextArea() {
-        return textArea;
+    public static JTable getTable() {
+        return table;
     }
 
     public static JLabel getTitleLable(){
         return titleLable;
     }
+
 }

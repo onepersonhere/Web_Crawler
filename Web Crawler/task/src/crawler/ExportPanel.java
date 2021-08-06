@@ -10,7 +10,7 @@ public class ExportPanel extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEADING));
         add(new JLabel("Export: "));
 
-        JTextField textField = new TextField();
+        JTextField textField = new URLField();
         textField.setPreferredSize(new Dimension(350,25));
         textField.setName("ExportUrlTextField");
         add(textField);

@@ -672,70 +672,6 @@ files:
         }
     }
   learner_created: true
-- name: src/crawler/TextField.java
-  visible: true
-  text: |
-    package crawler;
-
-    import javax.swing.*;
-    import java.awt.*;
-
-    public class TextField extends JTextField {
-        public TextField(){
-            setName("UrlTextField");
-            setPreferredSize(new Dimension(350, 25));
-        }
-    }
-  learner_created: true
-- name: src/crawler/TitlesTable.java
-  visible: true
-  text: |
-    package crawler;
-
-    import javax.swing.*;
-    import javax.swing.table.DefaultTableModel;
-    import javax.swing.table.TableColumn;
-    import javax.swing.table.TableModel;
-
-    public class TitlesTable extends JTable {
-        public TitlesTable(){
-            setName("TitlesTable");
-            DefaultTableModel model = new DefaultTableModel();
-            model.addColumn("URL");
-            model.addColumn("Title");
-            setModel(model);
-            setEnabled(false);
-        }
-    }
-  learner_created: true
-- name: src/crawler/TitleLabel.java
-  visible: true
-  text: |
-    package crawler;
-
-    import javax.swing.*;
-
-    public class TitleLabel extends JLabel {
-        public TitleLabel(){
-            setName("TitleLabel");
-        }
-    }
-  learner_created: true
-- name: src/crawler/TextArea.java
-  visible: true
-  text: |
-    package crawler;
-
-    import javax.swing.*;
-
-    public class TextArea extends JTextArea {
-        public TextArea(){
-            setText("HTML code?");
-            setName("HtmlTextArea");
-            setEnabled(false);
-        }
-    }
-  learner_created: true
 - name: src/crawler/ExportPanel.java
   visible: true
   text: |
@@ -799,6 +735,73 @@ files:
                     }
                 }
             });
+        }
+    }
+  learner_created: true
+- name: src/crawler/legacy/TextArea.java
+  visible: true
+  text: |
+    package crawler;
+
+    import javax.swing.*;
+
+    public class TextArea extends JTextArea {
+        public TextArea(){
+            setText("HTML code?");
+            setName("HtmlTextArea");
+            setEnabled(false);
+        }
+    }
+  learner_created: true
+- name: src/crawler/legacy/TitlesTable.java
+  visible: true
+  text: |
+    package crawler;
+
+    import javax.swing.*;
+    import javax.swing.table.DefaultTableModel;
+    import javax.swing.table.TableColumn;
+    import javax.swing.table.TableModel;
+
+    public class TitlesTable extends JTable {
+        public TitlesTable(){
+            setName("TitlesTable");
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("URL");
+            model.addColumn("Title");
+            setModel(model);
+            setEnabled(false);
+        }
+    }
+  learner_created: true
+- name: src/crawler/MainPanel.java
+  visible: true
+  learner_created: true
+- name: src/crawler/legacy/TitleLabel.java
+  visible: true
+  text: |
+    package crawler;
+
+    import javax.swing.*;
+
+    public class TitleLabel extends JLabel {
+        public TitleLabel(){
+            setName("TitleLabel");
+        }
+    }
+  learner_created: true
+- name: src/crawler/URLField.java
+  visible: true
+  text: |
+    package crawler;
+
+    import javax.swing.*;
+    import java.awt.*;
+
+    public class TextField extends JTextField {
+        public TextField(){
+            setName("UrlTextField");
+            setPreferredSize(new Dimension(350, 25));
         }
     }
   learner_created: true

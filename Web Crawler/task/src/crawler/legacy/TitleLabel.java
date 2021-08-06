@@ -1,4 +1,4 @@
-package crawler;
+package crawler.legacy;
 
 import javax.swing.*;
 

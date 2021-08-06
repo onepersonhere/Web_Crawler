@@ -1,9 +1,9 @@
 package crawler;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 public class Export {
     public Export(String filePath){
@@ -13,11 +13,11 @@ public class Export {
                 System.out.println("File created: " + file.getName());
             }
             PrintWriter os = new PrintWriter(file);
-            for (int row = 0; row < WebCrawler.getTable().getModel().getRowCount(); row++) {
-                for (int col = 0; col < WebCrawler.getTable().getModel().getColumnCount(); col++) {
-                    os.println(WebCrawler.getTable().getModel().getValueAt(row, col));
-                }
+            Map<String ,String> map = GetHTML.getMap();
+            for (Map.Entry<String,String> entry : map.entrySet()) {
+                    os.println(entry.getKey() + "\n" + entry.getValue());
             }
+
             os.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {

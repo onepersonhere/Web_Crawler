@@ -210,7 +210,7 @@ files:
 - name: src/crawler/TextArea.java
   visible: true
   learner_created: true
-- name: src/crawler/TextField.java
+- name: src/crawler/URLField.java
   visible: true
   learner_created: true
 - name: src/crawler/GetButton.java

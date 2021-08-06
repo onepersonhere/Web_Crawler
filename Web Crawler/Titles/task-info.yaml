@@ -268,7 +268,7 @@ files:
         }
     }
   learner_created: true
-- name: src/crawler/TextField.java
+- name: src/crawler/URLField.java
   visible: true
   text: |
     package crawler;
